@@ -25,7 +25,7 @@ public class ClienteController {
 	@Autowired
 	private ClienteService clienteService;
 	
-	@PostMapping
+    @PostMapping("/save")
 	public ResponseEntity<String> save(@RequestBody Cliente cliente){
 		try {
 			String mensagem = this.clienteService.save(cliente);
