@@ -1,0 +1,152 @@
+===========================================================================================================================================FUNCIONARIO CONTROLER ===========================================================
+===============================================================================================================
+
+package sistemaGestao.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import sistemaGestao.entity.Funcionario;
+import sistemaGestao.service.FuncionarioService;
+
+@RestController
+@RequestMapping("/funcionario")
+@CrossOrigin("http://localhost:4200")
+public class FuncionarioController{
+	
+	@Autowired
+	private FuncionarioService funcionarioService;
+	
+	@PostMapping("/save")
+	public ResponseEntity<String> save(@RequestBody Funcionario Funcionario){
+		
+		try{
+			String mensagem = this.funcionarioService.save(funcionario);
+			return new ResponseEntity<>(mensagem, HttpStatus.OK);
+		} catch (Exception e){
+			return new ResponseEntity<>("Algo deu errado!!" + e.getMessagem(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PutMapping("/update/{id}")
+	public ResponseEntity<String> update (@RequestBody Funcionario funcionario, @PathVariable int id){
+		try {
+			String mensagem = this.funcionarioService.update(id, funcionario);
+			return new ResponseEntity<String>(mensagem, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Algo deu errado!! " + e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/findAll")
+	Public ResponseEntity<List<Funcionario>> findAll(){
+		try{
+			List<Funcionario> lista = this.funcionarioService.findAll();
+			return new ResponseEntity<>(lista, HttpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/findById/{id}")
+	Public ResponseEntity<Funcionario> findById(@PathVariable int id){
+		try{
+			Funcionario funcionario = this.funcionarioService.findById(id);
+			return new ResponseEntity<>(funcionario, httpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+	
+	@DeleteMapping("/delete{/id}")
+	public ResponseEntity<String> delete(@PathVariable long id){
+		try{
+			String mensagem = this.funcionarioService.delete(id);
+			return new ReponseEntity<>(mensagem, HttpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<String>("Algo deu errado ao deletar! " + e.getMesage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+}
+
+=============================================================================================================================================================================================================================================================================================================================================
+
+===========================================================================================================================================    FUNCIONARIO SERVICE     ===========================================================
+===============================================================================================================
+package sistemaGestao.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import sistemaGestao.entity.funcionario;
+
+import sistemaGestao.repository.funcionarioRepository;
+
+@Service
+public class FuncionarioService{
+
+	@Autowired
+	private funcionarioRepository funcionarioRepository;
+	
+	public String save(Funcionario funcionario) {
+		this.funcionarioRepository.save(funcionario);
+		return  "Cadastrado com sucesso!";
+	}
+	
+	public String update(int id, Funcionario funcionario) {
+		funcionario.setId(id);
+		this.funcionarioRepository.save(funcionario);
+		return funcionario.getNome()+" atualizado com sucesso!";
+	}
+	
+	public List<funcionario> findAll(){
+		return this.funcionarioRepository.findAll();
+	}
+	
+	public funcionario findById(long id) {
+		Funcionario funcionario = this.funcionarioRepository.findById(id).get();
+		return funcionario;
+	}
+	
+	public String delete(long id) {
+		this.funcionarioRepository.deleteById(id);
+		return "Produto deletado com sucesso!"; 
+	}
+}
+
+=============================================================================================================================================================================================================================================================================================================================================
+
+============================================================================================================================================== FUNCIONARIO REPOSITORY =======================================================
+===============================================================================================================
+
+package sistemaGestao.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import sistemaGestao.entity.Funcionario;
+
+public interface FuncionarioRepository extends JpaRepository<Funcionario, Long>{
+
+}
+
+=============================================================================================================================================================================================================================================================================================================================================
+
+
+
+
+
