@@ -26,7 +26,7 @@ public class VendaProduto {
     
     @ManyToOne
     @JoinColumn(name = "id_produto")
-    private Produto produto;  // Produto será buscado por id_produto
+    private Produto produto; 
     
     @ManyToOne
     @JoinColumn(name = "id_cliente")

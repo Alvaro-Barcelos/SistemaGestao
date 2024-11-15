@@ -15,32 +15,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import sistemaGestao.entity.VendaProduto;
-import sistemaGestao.service.VendaProdutoService;
+
+import sistemaGestao.entity.TipoAtendimento;
+import sistemaGestao.service.TipoAtendimentoService;
 
 @RestController
-@RequestMapping("/venda")
+@RequestMapping("/tipoatendimento")
 @CrossOrigin("http://localhost:4200")
-public class VendaProdutoController {
+public class TipoAtendimentoController {
 
-    @Autowired
-    private VendaProdutoService vendaProdutoService;  
-
-
-    @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody VendaProduto vendaProduto) {
+	@Autowired
+	private TipoAtendimentoService tipoAtendimentoService;
+	
+	@PostMapping("/save")
+	public ResponseEntity<String> save(@RequestBody TipoAtendimento tipoAtendimento) {
         try {
-            String mensagem = this.vendaProdutoService.save(vendaProduto); 
+            String mensagem = this.tipoAtendimentoService.save(tipoAtendimento); 
             return new ResponseEntity<>(mensagem, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Deu erro!" + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    
+	
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody VendaProduto vendaProduto, @PathVariable int id){
+    public ResponseEntity<String> update(@RequestBody TipoAtendimento tipoAtendimento, @PathVariable int id){
     	try {
-			String mensagem = this.vendaProdutoService.update(id, vendaProduto);
+			String mensagem = this.tipoAtendimentoService.update(id, tipoAtendimento);
 			return new ResponseEntity<String>(mensagem, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>("Algo deu errado!! " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -48,45 +48,33 @@ public class VendaProdutoController {
     }
     
     @GetMapping("/findAll")
-    public ResponseEntity<List<VendaProduto>> findAlll(){
+    public ResponseEntity<List<TipoAtendimento>> findAll(){
     	try {
-			List<VendaProduto> lista = this.vendaProdutoService.findAll();
+			List<TipoAtendimento> lista = this.tipoAtendimentoService.findAll();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
     }
- // Endpoint para filtrar as vendas por mês e ano
-    @GetMapping("/findByDate/{year}/{month}")
-    public ResponseEntity<List<VendaProduto>> findByDate(@PathVariable int year, @PathVariable int month) {
-        try {
-            List<VendaProduto> lista = this.vendaProdutoService.findByMonthAndYear(year, month);
-            return new ResponseEntity<>(lista, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-    }
     
-    @GetMapping("/findById/{idVendaProduto}")
-    public ResponseEntity<VendaProduto> findById(@PathVariable int idVendaProduto){
+    @GetMapping("/findById/{idTipoAtendimento}")
+    public ResponseEntity<TipoAtendimento> findById(@PathVariable int idTipoAtendimento){
     	try {
-    		VendaProduto vendaProduto = this.vendaProdutoService.findById(idVendaProduto);
-        	return new ResponseEntity<>(vendaProduto, HttpStatus.OK);
+    		TipoAtendimento tipoAtendimento = this.tipoAtendimentoService.findById(idTipoAtendimento);
+        	return new ResponseEntity<>(tipoAtendimento, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
-    	
-
     }
     
-    
-    @DeleteMapping("/delete/{idVendaProduto}")
-    public ResponseEntity<String> delete(@PathVariable long idVendaProduto){
+    @DeleteMapping("/delete/{idTipoAtendimento}")
+    public ResponseEntity<String> delete(@PathVariable long idTipoAtendimento){
     	try {
-			String mensagem = this.vendaProdutoService.delete(idVendaProduto);
+			String mensagem = this.tipoAtendimentoService.delete(idTipoAtendimento);
 			return new ResponseEntity<>(mensagem, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>("Deu esse erro aqui: "+e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
     }
+	
 }

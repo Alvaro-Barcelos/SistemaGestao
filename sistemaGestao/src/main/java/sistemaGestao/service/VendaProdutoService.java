@@ -2,6 +2,7 @@ package sistemaGestao.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,11 +53,15 @@ public class VendaProdutoService {
 	        produto.setQuantidade(produto.getQuantidade() - vendaProduto.getQuantidade());
 	        produtoRepository.save(produto);
 
+	        // Se a venda não tem data, então defina a data de venda
+	        if (vendaProduto.getData_venda() == null) {
+	            vendaProduto.setData_venda(LocalDate.now()); // Define a data de venda como a data atual apenas para novas vendas
+	        }
+
 	        // Atualizar a vendaProduto com as entidades completas
 	        vendaProduto.setProduto(produto);
 	        vendaProduto.setCliente(cliente);
 	        vendaProduto.setFuncionario(funcionario);
-	        vendaProduto.setData_venda(LocalDate.now());
 
 	        // Salvar a venda
 	        try {
@@ -67,7 +72,8 @@ public class VendaProdutoService {
 	            throw new RuntimeException("Erro ao salvar a venda: " + e.getMessage());
 	        }
 	    }
-	
+
+
 	
 	public String update(int id, VendaProduto vendaProduto) {
 		vendaProduto.setId(id);
@@ -88,4 +94,12 @@ public class VendaProdutoService {
 		this.vendaProdutoRepository.deleteById(idVendaProduto);
 		return "Produto deletado com sucesso!"; 
 	}
+	
+    // Método para filtrar vendas por ano e mês
+    public List<VendaProduto> findByMonthAndYear(int year, int month) {
+        List<VendaProduto> vendas = this.vendaProdutoRepository.findAll();
+        return vendas.stream()
+                .filter(venda -> venda.getData_venda().getYear() == year && venda.getData_venda().getMonthValue() == month)
+                .collect(Collectors.toList());
+    }
 }
