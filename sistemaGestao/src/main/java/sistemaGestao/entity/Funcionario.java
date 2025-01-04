@@ -1,5 +1,8 @@
 package sistemaGestao.entity;
 
+import jakarta.persistence.*;
+import java.util.List;
+
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
@@ -18,22 +21,20 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Funcionario {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-	private String nome;
-	private String cargo;
-	private String telefone;
-	private String email;
-	private String cpf;
-	
-	private LocalDate data_nascimento;
-	
-	private String endereco;
-	private String bairro;
-	
-	private int numero;
-	
-	private String cidade;
+    private String nome;
+    private String cargo;
+    private String telefone;
+    private String email;
+    private String cpf;
+    private LocalDate dataNascimento;
+    private String endereco;
+    private String bairro;
+    private int numero;
+    private String cidade;
+
+
 }

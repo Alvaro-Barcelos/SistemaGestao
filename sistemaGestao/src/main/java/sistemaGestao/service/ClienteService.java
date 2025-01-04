@@ -2,7 +2,9 @@ package sistemaGestao.service;
 
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import sistemaGestao.entity.Cliente;
@@ -28,7 +30,8 @@ public class ClienteService {
 	}
 	
 	public List<Cliente> findAll(){
-		return this.clienteRepository.findAll();
+
+        return this.clienteRepository.findAll(Sort.by(Sort.Order.asc("nome")));
 	}
 	
 	public Cliente findById(long id) {
