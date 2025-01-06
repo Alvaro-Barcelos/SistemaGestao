@@ -2,6 +2,7 @@ package sistemaGestao.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.util.List;
 
@@ -31,50 +32,83 @@ public class AtendimentoService {
 
     @Autowired
     private TipoAtendimentoRepository tipoAtendimentoRepository;
-	
+
+    // Horários padrão para agendamento (pode ser ajustado conforme necessidade)
+    private static final List<LocalTime> HORARIOS_DISPONIVEIS = List.of(
+            LocalTime.of(9, 0),
+            LocalTime.of(10, 0),
+            LocalTime.of(11, 0),
+            LocalTime.of(13, 0),
+            LocalTime.of(14, 0),
+            LocalTime.of(15, 0),
+            LocalTime.of(16, 0),
+            LocalTime.of(17, 0)
+    );
+    
+    public long countByFuncionarioAndMonth(Long funcionarioId, int ano, int mes) {
+        return atendimentoRepository.countByFuncionarioAndMonth(funcionarioId, ano, mes);
+    }
+
+    public long countByClienteAndMonth(Long clienteId, int ano, int mes) {
+        return atendimentoRepository.countByClienteAndMonth(clienteId, ano, mes);
+    }
+
+    public List<LocalTime> getHorariosDisponiveis(Long funcionarioId, LocalDate dataAtendimento) {
+        // Busca atendimentos do funcionário para a data
+        List<Atendimento> atendimentos = atendimentoRepository.buscarAtendimentosPorFuncionarioEData(funcionarioId, dataAtendimento);
+
+        // Obtém os horários ocupados
+        List<LocalTime> horariosOcupados = atendimentos.stream()
+                .map(Atendimento::getHora_atendimento)
+                .toList();
+
+        // Retorna apenas os horários disponíveis
+        return HORARIOS_DISPONIVEIS.stream()
+                .filter(horario -> !horariosOcupados.contains(horario))
+                .toList();
+    }
+    
+    public List<LocalTime> getHorariosIndisponiveis(Long funcionarioId, LocalDate dataAtendimento) {
+        // Busca atendimentos do funcionário para a data
+        List<Atendimento> atendimentos = atendimentoRepository.buscarAtendimentosPorFuncionarioEData(funcionarioId, dataAtendimento);
+
+        // Obtém e retorna os horários ocupados
+        return atendimentos.stream()
+                .map(Atendimento::getHora_atendimento)
+                .toList();
+    }
+
+
     public String save(Atendimento atendimento) {
         try {
-            // Verificar e criar o Funcionario, Cliente, e TipoAtendimento caso não existam
-            if (atendimento.getFuncionario() == null || atendimento.getFuncionario().getId() == 0) {
-                return "Funcionário não pode ser nulo!";
-            } else {
-                // Verifica se o Funcionario existe no banco
-                Funcionario funcionario = funcionarioRepository.findById(atendimento.getFuncionario().getId()).orElse(null);
-                if (funcionario != null) {
-                    atendimento.setFuncionario(funcionario);
-                } else {
-                    return "Funcionário não encontrado!";
-                }
+        	
+        	System.out.println("Salvando atendimento com data: " + atendimento.getData_atendimento()); // Log de depuração.
+
+        	
+            // Verifica se o horário já está ocupado
+            boolean horarioOcupado = atendimentoRepository.verificarHorarioOcupado(
+                    atendimento.getFuncionario().getId(),
+                    atendimento.getData_atendimento(),
+                    atendimento.getHora_atendimento());
+
+            if (horarioOcupado) {
+                return "Horário já ocupado para o funcionário.";
             }
 
-            if (atendimento.getCliente() == null || atendimento.getCliente().getId() == 0) {
-                return "Cliente não pode ser nulo!";
-            } else {
-                // Verifica se o Cliente existe no banco
-                Cliente cliente = clienteRepository.findById(atendimento.getCliente().getId()).orElse(null);
-                if (cliente != null) {
-                    atendimento.setCliente(cliente);
-                } else {
-                    return "Cliente não encontrado!";
-                }
+            // Verifica as chaves estrangeiras antes de salvar
+            if (!funcionarioRepository.existsById(atendimento.getFuncionario().getId())) {
+                return "Funcionário não encontrado!";
+            }
+            if (!clienteRepository.existsById(atendimento.getCliente().getId())) {
+                return "Cliente não encontrado!";
+            }
+            if (!tipoAtendimentoRepository.existsById(atendimento.getTipo_atendimento().getId())) {
+                return "Tipo de Atendimento não encontrado!";
             }
 
-            if (atendimento.getTipo_atendimento() == null || atendimento.getTipo_atendimento().getId() == 0) {
-                return "Tipo de Atendimento não pode ser nulo!";
-            } else {
-                // Verifica se o TipoAtendimento existe no banco
-                TipoAtendimento tipoAtendimento = tipoAtendimentoRepository.findById(atendimento.getTipo_atendimento().getId()).orElse(null);
-                if (tipoAtendimento != null) {
-                    atendimento.setTipo_atendimento(tipoAtendimento);
-                } else {
-                    return "Tipo de Atendimento não encontrado!";
-                }
-            }
-
-            // Salvar o atendimento com as chaves estrangeiras corretamente associadas
-            Atendimento savedAtendimento = atendimentoRepository.save(atendimento);
-
-            return "Atendimento " + savedAtendimento.getId() + " salvo com sucesso!";
+            // Salva o atendimento
+            atendimentoRepository.save(atendimento);
+            return "Atendimento salvo com sucesso!";
         } catch (Exception e) {
             return "Erro ao salvar o atendimento: " + e.getMessage();
         }
@@ -87,9 +121,10 @@ public class AtendimentoService {
         // Define o último dia do mês
         LocalDate fimMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
 
-        // Agora, retornamos os atendimentos dentro desse intervalo de LocalDate
-        return atendimentoRepository.findByDataAtendimentoBetween(inicioMes, fimMes);
+        // Busca os atendimentos no intervalo de datas
+        return atendimentoRepository.buscarAtendimentosPorIntervalo(inicioMes, fimMes);
     }
+
 
 	
 	public String update(int id, Atendimento atendimento) {
