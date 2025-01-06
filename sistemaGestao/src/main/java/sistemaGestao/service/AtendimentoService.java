@@ -110,6 +110,6 @@ public class AtendimentoService {
 	
 	public String delete(long idAtendimento) {
 		this.atendimentoRepository.deleteById(idAtendimento);
-		return "Produto deletado com sucesso!";
+		return "Atendimento deletado com sucesso!";
 	}
 }
