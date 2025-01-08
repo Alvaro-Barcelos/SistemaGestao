@@ -1,6 +1,5 @@
 package sistemaGestao.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,13 +39,10 @@ public class Atendimento {
 	    @JoinColumn(name = "id_tipo_atendimento")
 	    private TipoAtendimento tipo_atendimento;
 
+	    // Alterando o tipo para LocalDateTime
+	    private LocalDate data_atendimento;  // Agora é LocalDateTime
 
-	    @Column(name = "data_atendimento")
-	    private LocalDate data_atendimento;
-
-	    @Column(name = "hora_atendimento")
 	    private LocalTime hora_atendimento;
-	    
 	    private String observacao;
 	
 }
