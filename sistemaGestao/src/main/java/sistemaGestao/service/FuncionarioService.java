@@ -3,6 +3,7 @@ package sistemaGestao.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import sistemaGestao.entity.Funcionario;
@@ -27,7 +28,8 @@ public class FuncionarioService{
 	}
 	
 	public List<Funcionario> findAll(){
-		return this.funcionarioRepository.findAll();
+        return this.funcionarioRepository.findAll(Sort.by(Sort.Order.asc("nome")));
+
 	}
 	
 	public Funcionario findById(long id) {
